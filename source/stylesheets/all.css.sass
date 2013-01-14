@@ -1,0 +1,81 @@
+@import "compass"
+
+body
+  margin: 0
+  background: black
+  position: absolute
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+  overflow: hidden
+
+.display
+  position: absolute
+  top: 0
+  left: 0
+  right: 25%
+  bottom: 25%
+  outline: orange 1px solid
+  +transform-style(preserve-3d)
+  overflow: hidden
+  +perspective(500)
+
+.controls
+  position: absolute
+  top: 0
+  left: 75%
+  bottom: 25%
+
+.movement
+  width: 100%
+  text-align: center
+
+.button
+  display: inline-block
+  background: lightgrey
+  +border-radius(10px)
+  width: 100px
+  height: 50px
+  line-height: 50px
+  font-size: 20px
+
+.button:first-child,
+.button:last-child
+  display: block
+  margin: auto
+
+#level
+  position: absolute
+  top: 50%
+  right: 0
+  bottom: 0
+  left: 50%
+  +transform-style(preserve-3d)
+  +transition(transform, 1s)
+
+.box
+  $size: 100px
+  position: absolute
+  width: $size
+  height: $size
+  +transform-style(preserve-3d)
+  .side
+    width: $size
+    height: $size
+    position: absolute
+    top: 0
+    left: 0
+    outline: 1px solid black
+  .left
+    +transform(rotateY(-90deg) translateZ($size / 2))
+    background: red
+  .right
+    +transform(rotateY(90deg) translateZ($size / 2))
+    background: yellow
+  .front
+    background: green
+    +transform(rotateY(0deg) translateZ($size / 2))
+  .back
+    +transform(rotateY(180deg) translateZ($size / 2))
+    background: blue
