@@ -4,10 +4,14 @@
         level = document.getElementById('level'),
         player = {},
         size = 100,
+        mapHeight,
+        mapWidth,
         forwardButton = document.getElementById('forward'),
         leftButton = document.getElementById('left'),
         rightButton = document.getElementById('right'),
-        backButton = document.getElementById('back');
+        backButton = document.getElementById('back'),
+        isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1,
+        isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;
 
     function stepForward() {
         switch (player.direction % 360) {
@@ -76,9 +80,21 @@
     }, false);
 
     function updatePosition() {
-        level.style.webkitTransform = 'translate3d(' + -(((player.x + 1) * size) - (size / 2)) + 'px, -50px, 500px) rotateY(' + player.direction + 'deg)';
-        level.style.webkitTransformOriginX = ((player.x * size) + (size / 2)) + 'px';
-        level.style.webkitTransformOriginZ = (player.y * size) + 'px'; 
+        if (isChrome) {
+            level.style.webkitTransform = 'translate3d(' + -(((player.x + 1) * size) - (size / 2)) + 'px, -50px, ' + (500 - (player.y * size))  + 'px) rotateY(' + player.direction + 'deg)';
+            level.style.webkitTransformOriginX = ((player.x * size) + (size / 2)) + 'px';
+            level.style.webkitTransformOriginZ = (player.y * size) + 'px';
+            return;
+        }
+        if (isSafari) {
+            level.style.webkitTransform = 'translate3d(' + -(((player.x + 1) * size) - (size / 2)) + 'px, -50px, 500px) rotateY(' + player.direction + 'deg)';
+            level.style.webkitTransformOriginX = ((player.x * size) + (size / 2)) + 'px';
+            level.style.webkitTransformOriginZ = (player.y * size) + 'px';
+            return;
+        }
+        // firefox
+        level.style.transform = 'translate3d(' + -(((player.x + 1) * size) - (size / 2)) + 'px, -50px, ' + (500 - (player.y * size))  + 'px) rotateY(' + player.direction + 'deg)';
+        level.style.transformOrigin = ((player.x * size) + (size / 2)) + 'px 0px ' + (player.y * size) + 'px';
     };
 
     function buildLevel(map) {
@@ -92,7 +108,7 @@
             for (x = 0; x < map[y].length; x += 1) {
                 if (map[y][x] === '#') {
                     transform = 'translate3d(' + (x * size) + 'px, 0px, ' + (y * size) + 'px)';
-                    level.innerHTML += '<div class="box" style="-webkit-transform: ' + transform + '">' +
+                    level.innerHTML += '<div class="box" style="-webkit-transform: ' + transform + '; transform: ' + transform + '">' +
                                        '<div class="front side"></div>' +
                                        '<div class="back side"></div>' +
                                        '<div class="left side"></div>' +
@@ -106,6 +122,8 @@
                 }
             }
         }
+        mapHeight = map.length;
+        mapWidth = map[0].length;
         updatePosition();
     };
 
@@ -123,49 +141,14 @@
         "#.......#..........#",
         "#.......#.##########",
         "##.######.##########",
-        "##.######.####.....#",
+        "##.#####...###.....#",
         "##.##....s.........#",
-        "##.###.##.####.....#",
+        "##.###.#...###.....#",
         "##.###.##.######.###",
         "##.##...#.#####...##",
         "##......#.#####...##",
         "####################"
     ];
-
-    //var testLevel = [
-    //    "####",450
-    //    "####",350
-    //    "####",250
-    //    "#.##",150
-    //    "#..#",50
-    //    "#s.#",-50
-    //    "####"-150
-    //];
-
-    //var testLevel = [
-    //    "####",450
-    //    "#.##",350
-    //    "#..#",250
-    //    "#s.#",150
-    //    "####"50
-    //];
-
-    var testLevel = [
-        "####",
-        "#.##",
-        "#.##",
-        "#..#",
-        "#s.#",
-        "####"
-    ];
-
-    var Game = function () {
-        var game = {};
-
-
-
-        return game;
-    };
 
     buildLevel(levelmap);
 })();

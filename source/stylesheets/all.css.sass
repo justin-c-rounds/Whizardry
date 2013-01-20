@@ -19,7 +19,7 @@ body
   outline: orange 1px solid
   +transform-style(preserve-3d)
   overflow: hidden
-  +perspective(500)
+  +perspective(500px)
 
 .controls
   position: absolute
@@ -53,6 +53,8 @@ body
   left: 50%
   +transform-style(preserve-3d)
   +transition(transform, 1s)
+  // seems like the compass transition mixin isn't producing firefox-friendly css
+  -moz-transition: transform 1s
 
 .box
   $size: 100px
@@ -67,6 +69,7 @@ body
     top: 0
     left: 0
     outline: 1px solid black
+    +backface-visibility(hidden)
   .left
     +transform(rotateY(-90deg) translateZ($size / 2))
     background: red
