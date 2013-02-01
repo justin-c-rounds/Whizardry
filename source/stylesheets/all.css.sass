@@ -16,7 +16,6 @@ body
   left: 0
   right: 25%
   bottom: 25%
-  outline: orange 1px solid
   +transform-style(preserve-3d)
   overflow: hidden
   +perspective(500px)
@@ -31,19 +30,33 @@ body
   width: 100%
   text-align: center
 
+#console
+  position: absolute
+  top: 75%
+  left: 0
+  right: 0
+  bottom: 0
+  padding: 10px
+  color: white
+  font-family: Helvetica, Arial, sans-serif
+  overflow-y: scroll
+
 .button
   display: inline-block
-  background: lightgrey
+  +background-image(linear-gradient(lightgray, gray))
+  +single-box-shadow(dimgray, 0px, -5px, 0px, 2px, true)
   +border-radius(10px)
   width: 100px
   height: 50px
   line-height: 50px
-  font-size: 20px
+  font-size: 30px
+  cursor: pointer
+  margin: 5px
 
 .button:first-child,
 .button:last-child
   display: block
-  margin: auto
+  margin: 5px auto
 
 #level
   position: absolute
@@ -56,8 +69,16 @@ body
   // seems like the compass transition mixin isn't producing firefox-friendly css
   -moz-transition: transform 1s
 
+$size: 100px
+
+.floor
+  position: absolute
+  background: green
+  +transform(rotateX(90deg) translateZ(900px) translateY(950px))
+  +backface-visibility(hidden)
+  display: none
+
 .box
-  $size: 100px
   position: absolute
   width: $size
   height: $size
@@ -68,17 +89,20 @@ body
     position: absolute
     top: 0
     left: 0
-    outline: 1px solid black
     +backface-visibility(hidden)
+    +background-image(url('/images/wall.png'))
+    +background-size(100%)
   .left
     +transform(rotateY(-90deg) translateZ($size / 2))
-    background: red
   .right
     +transform(rotateY(90deg) translateZ($size / 2))
-    background: yellow
   .front
-    background: green
     +transform(rotateY(0deg) translateZ($size / 2))
   .back
     +transform(rotateY(180deg) translateZ($size / 2))
-    background: blue
+  .top
+    +transform(rotateX(-90deg) translateZ($size / -2))
+    +background-image(url('/images/ceiling.png'))
+  .bottom
+    +transform(rotateX(90deg) translateZ($size / -2))
+    +background-image(url('/images/floor.png'))

@@ -4,8 +4,10 @@
         level = document.getElementById('level'),
         player = {},
         size = 100,
-        mapHeight,
-        mapWidth,
+        map,
+        isRunning = true,
+        moves = 0,
+        gameConsole = document.getElementById('console'),
         forwardButton = document.getElementById('forward'),
         leftButton = document.getElementById('left'),
         rightButton = document.getElementById('right'),
@@ -13,73 +15,71 @@
         isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1,
         isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;
 
-    function stepForward() {
+    function step(direction) {
+
+        var
+            currentPosition = {
+                x: player.x,
+                y: player.y
+            };
+
+        moves = moves + 1;
+
         switch (player.direction % 360) {
             case 0:
-                player.y -= 1;
+                player.y -= direction;
                 break;
             case 90:
             case -270:
-                player.x += 1;
+                player.x += direction;
                 break;
             case 180:
             case -180:
-                player.y += 1;
+                player.y += direction;
                 break;
             case 270:
             case -90:
-                player.x -= 1;
+                player.x -= direction;
         }
-        updatePosition();
-    };
 
-    function stepBack() {
-        switch (player.direction % 360) {
-            case 0:
-                player.y += 1;
-                break;
-            case 90:
-            case -270:
-                player.x -= 1;
-                break;
-            case 180:
-            case -180:
-                player.y -= 1;
-                break;
-            case 270:
-            case -90:
-                player.x += 1;
+        if (map[player.y][player.x] === '#') {
+            player.x = currentPosition.x;
+            player.y = currentPosition.y;
+            return;
         }
+
+        if (map[player.y][player.x] === 'e') {
+            gameConsole.innerHTML = '<p>Congratulations! You found the exit in <strong>' + moves + '</strong> moves! Refresh this page to try again.</p>' + gameConsole.innerHTML;
+            isRunning = false;
+        }
+
         updatePosition();
     };
 
-    function turnLeft() {
-        player.direction -= 90;
-        updatePosition();
-    };
-
-    function turnRight() {
-        player.direction += 90;
+    function turn(direction) {
+        moves = moves + 1;
+        player.direction += direction;
         updatePosition();
     };
 
     forwardButton.addEventListener('click', function () {
-        stepForward();
+        if (isRunning) step(1);
     }, false);
 
     leftButton.addEventListener('click', function () {
-        turnLeft();
+        if (isRunning) turn(-90);
     }, false);
 
     rightButton.addEventListener('click', function () {
-        turnRight();
+        if (isRunning) turn(90);
     }, false);
 
     backButton.addEventListener('click', function () {
-        stepBack();
+        if (isRunning) step(-1);
     }, false);
 
     function updatePosition() {
+
         if (isChrome) {
             level.style.webkitTransform = 'translate3d(' + -(((player.x + 1) * size) - (size / 2)) + 'px, -50px, ' + (500 - (player.y * size))  + 'px) rotateY(' + player.direction + 'deg)';
             level.style.webkitTransformOriginX = ((player.x * size) + (size / 2)) + 'px';
@@ -101,36 +101,46 @@
         var
             x,
             y,
-            block,
+            html = '',
             transform;
 
         for (y = 0; y < map.length; y += 1) {
             for (x = 0; x < map[y].length; x += 1) {
-                if (map[y][x] === '#') {
-                    transform = 'translate3d(' + (x * size) + 'px, 0px, ' + (y * size) + 'px)';
-                    level.innerHTML += '<div class="box" style="-webkit-transform: ' + transform + '; transform: ' + transform + '">' +
-                                       '<div class="front side"></div>' +
-                                       '<div class="back side"></div>' +
-                                       '<div class="left side"></div>' +
-                                       '<div class="right side"></div>' +
-                                       '</div>';
+
+                transform = 'translate3d(' + (x * size) + 'px, 0px, ' + (y * size) + 'px)';
+                html += '<div class="box" style="-webkit-transform: ' + transform + '; transform: ' + transform + '">';
+
+                switch (map[y][x]) {
+                    case '#':
+                        html += '<div class="front side"></div>' +
+                                '<div class="back side"></div>' +
+                                '<div class="left side"></div>' +
+                                '<div class="right side"></div>';
+                        break;
+                    case 's':
+                        player.x = x;
+                        player.y = y;
+                        player.direction = 0;
+                    case '.':
+                    case 'e':
+                        html += '<div class="top side"></div>' +
+                                '<div class="bottom side"></div>';
                 }
-                if (map[y][x] === 's') {
-                    player.x = x;
-                    player.y = y;
-                    player.direction = 0;
-                }
+
+                html += '</div>';
+
             }
         }
-        mapHeight = map.length;
-        mapWidth = map[0].length;
+
+        level.innerHTML = html;
+
         updatePosition();
     };
 
-    var levelmap = [
+    map = [
         "####################",
-        "#....#########.....#",
-        "#..........###..##.#",
+        "#....#########....e#",
+        "#..........###..####",
         "#....#####.###..##.#",
         "#....#####.........#",
         "##.#################",
@@ -150,5 +160,5 @@
         "####################"
     ];
 
-    buildLevel(levelmap);
+    buildLevel(map);
 })();
